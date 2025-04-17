@@ -1,4 +1,5 @@
-streamlit>=1.0
-numpy>=1.21
-pandas>=1.3
-git+https://github.com/BoonIoT/python-bchlib.git
+streamlit
+numpy
+pandas
+matplotlib
+bchlib
