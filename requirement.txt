@@ -1,5 +1,5 @@
-numpy
-matplotlib
-bchlib
-pandas
 streamlit
+matplotlib
+numpy
+pandas
+bchlib
