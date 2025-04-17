@@ -1,5 +1,5 @@
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import os
 import bchlib
 import pandas as pd
@@ -59,7 +59,7 @@ def parse_side_info(side_info, num_eq, CSI_LEN, EQUALIZER_LEN, HEADER_LEN):
 def get_csi(name):
     side_info_fd = open(name, 'r', encoding='utf-8')
     tempcsi = []
-    # plt.ion()
+    plt.ion()
 
     one_len = 1896
     start = 0
