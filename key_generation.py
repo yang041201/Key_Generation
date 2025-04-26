@@ -546,6 +546,8 @@ with st.sidebar:
             }[st.session_state.page]
         )
     )
+    st.markdown("---")
+    st.caption("信息安全竞赛")
 
 # 页面映射
 page_mapping = {
@@ -650,6 +652,9 @@ with st.container():
             st.write("基于初始密钥进行协商。")
             st.markdown("<hr style='height:1px;border:none;background-color:#9FA8DA;' />", unsafe_allow_html=True)
 
+            # 插入图片
+            st.image("flow_chart.png", caption="密钥协商流程图", use_container_width=True)
+
             if st.button("🔁 开始密钥协商", use_container_width=True):
                 # 执行密钥协商过程（即隐私放大过程）
                 selected_str = [item[1] for item in selected_keys]  # 提取 selected_keys 中的部分数据
@@ -666,6 +671,8 @@ with st.container():
             if st.session_state.final_key:
                 with st.expander("🔎 查看协商后的密钥"):
                     st.code(st.session_state.final_key, language="text")
+
+
 
     elif st.session_state.page == '密钥评估':
         with st.container():
