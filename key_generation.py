@@ -704,31 +704,32 @@ with st.container():
                     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
                     # 单比特频数
-                    axes[0, 0].bar(['实际比例'], [test_results['单比特频数']['比例']], color='skyblue')
+                    axes[0, 0].bar(['Actual Proportion'], [test_results['单比特频数']['比例']], color='skyblue')
                     axes[0, 0].axhline(0.5, color='r', linestyle='--')
                     axes[0, 0].set_ylim(0.4, 0.6)
-                    axes[0, 0].set_title(f"单比特频数检测\np值={test_results['单比特频数']['p值']}")
+                    axes[0, 0].set_title(f"Single Bit Frequency Test\np-value={test_results['单比特频数']['p值']}")
 
                     # 块内频数
                     props = test_results['块内频数'].get('块比例', [])
                     axes[0, 1].plot(props, 'o-', color='orange')
                     axes[0, 1].axhline(0.5, color='r', linestyle='--')
                     axes[0, 1].fill_between(range(len(props)), 0.45, 0.55, color='yellow', alpha=0.1)
-                    axes[0, 1].set_title(f"块内频数检测\np值={test_results['块内频数']['p值']}")
+                    axes[0, 1].set_title(f"Block Frequency Test\np-value={test_results['块内频数']['p值']}")
 
                     # 近似熵
-                    status = '通过' if test_results['近似熵']['通过'] else '未通过'
+                    status = 'Passed' if test_results['近似熵']['通过'] else 'Failed'
                     axes[1, 0].text(0.5, 0.5, status, ha='center', va='center', fontsize=20,
-                                color='green' if test_results['近似熵']['通过'] else 'red')
+                                    color='green' if test_results['近似熵']['通过'] else 'red')
                     axes[1, 0].axis('off')
-                    axes[1, 0].set_title(f"近似熵检测\np值={test_results['近似熵']['p值']}")
+                    axes[1, 0].set_title(f"Approximate Entropy Test\np-value={test_results['近似熵']['p值']}")
 
                     # 自相关
                     lags = [c['滞后'] for c in test_results['自相关']['相关系数列表']]
                     corrs = [c['相关系数'] for c in test_results['自相关']['相关系数列表']]
                     axes[1, 1].plot(lags, corrs, 'o-', color='purple')
                     axes[1, 1].axhline(0.5, color='r', linestyle='--')
-                    axes[1, 1].set_title("自相关检测")
+                    axes[1, 1].set_title("Autocorrelation Test")
+
 
                     plt.tight_layout()
 
