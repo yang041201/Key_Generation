@@ -546,8 +546,7 @@ with st.sidebar:
             }[st.session_state.page]
         )
     )
-    st.markdown("---")
-    st.caption("信息安全竞赛")
+
 
 # 页面映射
 page_mapping = {
