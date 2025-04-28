@@ -546,7 +546,8 @@ with st.sidebar:
             }[st.session_state.page]
         )
     )
-
+    st.markdown("---")
+    st.caption("信息安全竞赛")
 
 # 页面映射
 page_mapping = {
@@ -645,32 +646,84 @@ with st.container():
                 st.dataframe(table_data, use_container_width=True)
 
 
+
     elif st.session_state.page == '密钥协商':
         with st.container():
             st.markdown("<h3 style='color:#5C6BC0;'>🤝 密钥协商</h3>", unsafe_allow_html=True)
             st.write("基于初始密钥进行协商。")
             st.markdown("<hr style='height:1px;border:none;background-color:#9FA8DA;' />", unsafe_allow_html=True)
 
-            # 插入图片
-            st.image("flow_chart.png", caption="密钥协商流程图", use_container_width=True)
-
             if st.button("🔁 开始密钥协商", use_container_width=True):
                 # 执行密钥协商过程（即隐私放大过程）
-                selected_str = [item[1] for item in selected_keys]  # 提取 selected_keys 中的部分数据
+                selected_str = [item[1] for item in selected_keys]  # 提取选中的密钥块内容
                 key_256 = "".join(selected_str)  # 合并成一个大字符串
                 key_256_byte = bytes.fromhex(key_256)  # 转换为字节
                 hash_obj = sha3_256(key_256_byte).digest()  # 哈希生成
                 final_key = hash_obj[:16]  # 取前16个字节作为最终密钥
 
-                st.session_state.final_key = final_key.hex()  # 保存最终密钥（以十六进制形式）
+                st.session_state.final_key = final_key.hex()  # 保存最终密钥（十六进制）
 
                 st.success("✅ 密钥协商完成！", icon="🤝")
-        
-            # 显示最终协商的密钥
-            if st.session_state.final_key:
-                with st.expander("🔎 查看协商后的密钥"):
-                    st.code(st.session_state.final_key, language="text")
 
+            # 显示协商密钥和分块对比
+            if 'a_init_key' in st.session_state and 'b_init_key' in st.session_state and st.session_state.get('final_key'):
+                with st.expander("🔎 查看协商详情"):
+                    # 分块
+                    block_size = 16  # 每16 bit一块
+                    a_blocks = [st.session_state.a_init_key[i:i+block_size] for i in range(0, len(st.session_state.a_init_key), block_size)]
+                    b_blocks = [st.session_state.b_init_key[i:i+block_size] for i in range(0, len(st.session_state.b_init_key), block_size)]
+
+                    # 保持长度一致
+                    min_blocks = min(len(a_blocks), len(b_blocks))
+                    a_blocks = a_blocks[:min_blocks]
+                    b_blocks = b_blocks[:min_blocks]
+
+                    # 提取final_key对应的分块
+                    final_key_bits = bin(int(st.session_state.final_key, 16))[2:].zfill(128)  # final_key是16字节=128bit
+                    final_blocks = [final_key_bits[i:i+block_size] for i in range(0, len(final_key_bits), block_size)]
+
+                    # 建立被选中块的编号集合
+                    selected_indices = [item[0] for item in selected_keys]
+
+                    # 生成协商结果（只显示被选中的块，其他为❌）
+                    final_display_blocks = []
+                    for i in range(min_blocks):
+                        if i in selected_indices:
+                            if i < len(final_blocks):
+                                final_display_blocks.append(final_blocks[i])
+                            else:
+                                final_display_blocks.append("-")
+                        else:
+                            final_display_blocks.append("❌")
+
+                    # 创建DataFrame
+                    df = pd.DataFrame({
+                        "块编号": [f"块{i+1}" for i in range(min_blocks)],
+                        "Alice初始密钥块": a_blocks,
+                        "Bob初始密钥块": b_blocks,
+                        "协商后密钥块": final_display_blocks
+                    })
+
+                    # 添加开关：只显示被选中的块
+                    only_show_selected = st.checkbox("🔍 只看被选中的块", value=False)
+
+                    if only_show_selected:
+                        df = df[df["协商后密钥块"] != "❌"]
+
+                    st.markdown("<h4 style='color:#5C6BC0;'>🔍 分块对比表格</h4>", unsafe_allow_html=True)
+                    st.dataframe(df, use_container_width=True)
+
+                # 展示最终密钥（十六进制 + 二进制）
+                with st.expander("🔎 查看最终协商密钥"):
+                    if st.button("📄 显示最终密钥", use_container_width=True):
+                        final_key_hex = st.session_state.final_key
+                        final_key_bin = bin(int(final_key_hex, 16))[2:].zfill(128)
+
+                        st.write("🔹 **十六进制表示**")
+                        st.code(final_key_hex, language="text")
+
+                        st.write("🔹 **二进制表示**")
+                        st.code(final_key_bin, language="text")
 
 
     elif st.session_state.page == '密钥评估':
@@ -708,7 +761,7 @@ with st.container():
                     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
                     # 单比特频数
-                    axes[0, 0].bar(['Actual Proportion'], [test_results['单比特频数']['比例']], color='skyblue')
+                    axes[0, 0].bar(['Actual Proportion'], [test_results['单比特频数']['比例']], color='skyblue') 
                     axes[0, 0].axhline(0.5, color='r', linestyle='--')
                     axes[0, 0].set_ylim(0.4, 0.6)
                     axes[0, 0].set_title(f"Single Bit Frequency Test\np-value={test_results['单比特频数']['p值']}")
